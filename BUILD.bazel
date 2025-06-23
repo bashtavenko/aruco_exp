@@ -1,0 +1,73 @@
+load("@buildifier_prebuilt//:rules.bzl", "buildifier")
+
+package(default_visibility = ["//visibility:public"])
+
+# bazel run //:buildifier
+# .. or warn
+buildifier(
+    name = "buildifier",
+    exclude_patterns = [
+        "./bazel-*/*",
+        "./.git/*",
+    ],
+    lint_mode = "fix",
+)
+
+cc_library(
+    name = "opencv_release",
+    srcs = glob(["third_party/opencv/lib/*.so*"]),
+    hdrs = glob(["third_party/opencv/include/**/*"]),
+    includes = ["third_party/opencv/include"],
+    linkopts = [
+        "-lopencv_core",
+        "-lopencv_imgproc",
+        "-lopencv_flann",
+        "-lopencv_features2d",
+        "-lopencv_calib3d",
+        "-lopencv_objdetect",
+        "-lopencv_aruco",
+    ],
+)
+
+cc_library(
+    name = "opencv_debug",
+    srcs = glob(["third_party/opencv/lib_debug/*.so*"]),
+    hdrs = glob(["third_party/opencv/include/**/*"]),
+    includes = ["third_party/opencv/include"],
+    linkopts = [
+        "-lopencv_core",
+        "-lopencv_imgproc",
+        "-lopencv_flann",
+        "-lopencv_features2d",
+        "-lopencv_calib3d",
+        "-lopencv_objdetect",
+        "-lopencv_aruco",
+    ],
+)
+
+config_setting(
+    name = "debug_build",
+    values = {"compilation_mode": "dbg"},
+)
+
+cc_library(
+    name = "opencv",
+    deps = select({
+        ":debug_build": [":opencv_debug"],
+        "//conditions:default": [":opencv_release"],
+    }),
+)
+
+cc_binary(
+    name = "aruco_main",
+    srcs = ["aruco_main.cc"],
+    deps = [
+        ":opencv",
+        "@absl//absl/flags:flag",
+        "@absl//absl/flags:parse",
+        "@absl//absl/status",
+        "@gflags",
+        "@glog",
+        "@status_macros",
+    ],
+)
