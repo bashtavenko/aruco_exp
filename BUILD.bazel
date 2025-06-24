@@ -34,6 +34,9 @@ cc_library(
     srcs = glob(["third_party/opencv/lib_debug/*.so*"]),
     hdrs = glob(["third_party/opencv/include/**/*"]),
     includes = ["third_party/opencv/include"],
+    # Aruco depends on
+    # aruco opencv_core opencv_imgproc opencv_calib3d opencv_objdetect WRAP python java objc js
+    # Which means the order of dependencies must be in reverse order as opposed to CMake order
     linkopts = [
         "-lopencv_core",
         "-lopencv_imgproc",
