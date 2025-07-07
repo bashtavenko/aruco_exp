@@ -1,6 +1,6 @@
 #!/bin/bash
 
-OPENCV_BUILD="$HOME/opencv_build"
+OPENCV_BUILD="$HOME/opencv_build_411"
 THIRD_PARTY_DIR="third_party/opencv"
 
 mkdir -p "$THIRD_PARTY_DIR"

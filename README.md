@@ -57,6 +57,6 @@ cmake(
 
 With `opencv_contrib` this is a bit more complicated. 
 
-One approach is to build [shared libraries](opencv_build_script.sh) and 
+One approach is to build [shared libraries](opencv_build_script_480.sh) and 
 then [link](link_opencv.sh) to local directory `third_party`.
 
