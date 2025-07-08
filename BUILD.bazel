@@ -15,7 +15,16 @@ buildifier(
 
 cc_library(
     name = "opencv_release",
-    srcs = glob(["third_party/opencv/lib/*.so*"]),
+    srcs = select({
+        "@platforms//os:linux": glob(
+            ["third_party/opencv/lib/*.so*"],
+            allow_empty = True,
+        ),
+        "@platforms//os:macos": glob(
+            ["third_party/opencv/lib/*.dylib"],
+            allow_empty = True,
+        ),
+    }),
     hdrs = glob(["third_party/opencv/include/**/*"]),
     includes = ["third_party/opencv/include"],
     linkopts = [
@@ -31,7 +40,16 @@ cc_library(
 
 cc_library(
     name = "opencv_debug",
-    srcs = glob(["third_party/opencv/lib_debug/*.so*"]),
+    srcs = select({
+        "@platforms//os:linux": glob(
+            ["third_party/opencv/lib_debug/*.so*"],
+            allow_empty = True,
+        ),
+        "@platforms//os:macos": glob(
+            ["third_party/opencv/lib_debug/*.dylib"],
+            allow_empty = True,
+        ),
+    }),
     hdrs = glob(["third_party/opencv/include/**/*"]),
     includes = ["third_party/opencv/include"],
     # Aruco depends on
