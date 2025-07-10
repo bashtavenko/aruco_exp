@@ -13,7 +13,7 @@ absl::Status Run() {
 
   cv::aruco::Dictionary dictionary =
       cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_250);
-  cv::aruco::generateImageMarker(dictionary, 23, 200, marker_image, 1);
+  cv::aruco::generateImageMarker(dictionary, 4, 100, marker_image, 1);
   cv::imshow("Marker", marker_image);
   cv::waitKey(0);
   cv::destroyAllWindows();
