@@ -11,6 +11,7 @@
 #include "opencv2/objdetect/aruco_dictionary.hpp"
 #include "projection.h"
 #include "status_macros.h"
+#include "absl/strings/str_format.h"
 
 ABSL_FLAG(std::string, image_or_video_path, "testdata/frame_0.jpg",
           "Image or video input path");
@@ -162,6 +163,8 @@ absl::Status RunVideo(const cv::Mat& camera_matrix,
   constexpr absl::string_view kWindow = "Projection";
   cv::namedWindow(kWindow.data(), cv::WINDOW_FREERATIO);
 
+  int32_t frame_count = 0;
+  int64_t total_processing_ticks = 0;
   for (;;) {
     if (!cap.read(frame)) {
       // Better than >> operator for error detection
@@ -172,12 +175,16 @@ absl::Status RunVideo(const cv::Mat& camera_matrix,
       break;  // Safety check
     }
 
+    ++frame_count;
+    int64_t start_ticks = cv::getTickCount();
     auto status = ProcessImage(frame, camera_matrix, distortion_parameters);
+    int64_t end_ticks = cv::getTickCount();
+
     if (!status.ok()) {
       LOG(ERROR) << "Failed to process frame";
       continue;
-      ;
     }
+    total_processing_ticks += (end_ticks - start_ticks);
 
     writer.write(frame);
     cv::imshow(kWindow.data(), frame);
@@ -185,6 +192,11 @@ absl::Status RunVideo(const cv::Mat& camera_matrix,
     int key = cv::waitKey(33) & 0xFF;  // Mask to get 8-bit value
     if (key == 27) break;              // ESC key only
   }
+  const double total_processing_time_ms = total_processing_ticks / cv::getTickFrequency() * 1000.0;
+  const double processing_fps = frame_count / (total_processing_time_ms / 1000.0);
+  const double mean_ms_per_frame = total_processing_time_ms / frame_count;
+  LOG(INFO) << absl::StreamFormat("Mean FPS: %.0f", processing_fps);
+  LOG(INFO) << absl::StreamFormat("Mean latency %.0f ms", mean_ms_per_frame);
 
   return absl::OkStatus();
 }
