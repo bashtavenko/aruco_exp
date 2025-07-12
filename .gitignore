@@ -41,4 +41,5 @@ MODULE.bazel.lock
 
 third_party
 
+testdata/*.mp4
 
