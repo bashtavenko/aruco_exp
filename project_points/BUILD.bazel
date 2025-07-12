@@ -48,3 +48,19 @@ cc_binary(
         "@status_macros",
     ],
 )
+
+cc_binary(
+    name = "projection_main",
+    srcs = ["projection_main.cc"],
+    data = ["//testdata"],
+    deps = [
+        ":projection",
+        "//:opencv",
+        "@absl//absl/flags:flag",
+        "@absl//absl/flags:parse",
+        "@absl//absl/status",
+        "@gflags",
+        "@glog",
+        "@status_macros",
+    ],
+)
