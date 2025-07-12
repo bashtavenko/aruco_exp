@@ -83,7 +83,7 @@ cc_binary(
     name = "aruco_main",
     srcs = ["aruco_main.cc"],
     deps = [
-        ":opencv",
+        "//:opencv",
         "@absl//absl/flags:flag",
         "@absl//absl/flags:parse",
         "@absl//absl/status",

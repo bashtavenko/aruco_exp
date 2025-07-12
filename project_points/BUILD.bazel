@@ -1,0 +1,50 @@
+load("@rules_cc//cc:defs.bzl", "cc_proto_library")
+load("@rules_proto//proto:defs.bzl", "proto_library")
+
+cc_library(
+    name = "projection",
+    srcs = ["projection.cc"],
+    hdrs = ["projection.h"],
+    deps = [
+        ":calibration_data_cc",
+        "//:opencv",
+        "@absl//absl/status",
+    ],
+)
+
+proto_library(
+    name = "calibration_data",
+    srcs = ["calibration_data.proto"],
+)
+
+cc_proto_library(
+    name = "calibration_data_cc",
+    deps = [":calibration_data"],
+)
+
+cc_test(
+    name = "projection_test",
+    srcs = ["projection_test.cc"],
+    data = ["//testdata"],
+    deps = [
+        ":projection",
+        "@bazel_tools//tools/cpp/runfiles",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_binary(
+    name = "detect_aruco_main",
+    srcs = ["detect_aruco_main.cc"],
+    data = ["//testdata"],
+    deps = [
+        ":projection",
+        "//:opencv",
+        "@absl//absl/flags:flag",
+        "@absl//absl/flags:parse",
+        "@absl//absl/status",
+        "@gflags",
+        "@glog",
+        "@status_macros",
+    ],
+)
