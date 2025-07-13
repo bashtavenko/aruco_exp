@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package sfm.proto;
+package aruco_exp.proto;
 
-// Camera intrinsic matrix
+//  THE camera matrix
 message CameraMatrix {
   // Camera focal distance.
   // It is a product of the physical focal length of the lens and the size Sx
@@ -25,7 +25,7 @@ message CameraMatrix {
 //   perfectly parallel to the imaging plane and the image appears nearer than
 //   expected.
 // See more at https://docs.opencv.org/4.x/dc/dbb/tutorial_py_calibration.html
-message DistortionParameters {
+message DistortionParams {
   // There may be 4, 5 or 8 parameters which are 3 or more radial parameters
   // k1..k5 and 2 possible tangential parameters p1 and p2.
   // If length 4 then there should be k1, k2, p1 and p2.
@@ -41,8 +41,8 @@ message DistortionParameters {
   optional float p2 = 7;
 }
 
-message CalibrationResult {
-  float reprojection_error = 1;
-  CameraMatrix camera_matrix = 2;
-  DistortionParameters distortion_parameters = 3;
+message IntrinsicCalibration {
+  CameraMatrix camera_matrix = 1;
+  DistortionParams distortion_params = 2;
+  float reprojection_error = 3;
 }

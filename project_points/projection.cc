@@ -43,7 +43,7 @@ std::unordered_map<int32_t, cv::Point> DetectArucoPoints(
   std::vector<std::vector<cv::Point2f>> rejected;
 
   detector.detectMarkers(image, corners, ids, rejected);
-  for (int i = 0; i < corners.size(); ++i) {
+  for (int32_t i = 0; i < static_cast<int32_t>(corners.size()); ++i) {
     int32_t marker_id = ids[i];
     cv::Rect bbox = cv::boundingRect(corners[i]);
     cv::Point center = (bbox.tl() + bbox.br()) / 2;

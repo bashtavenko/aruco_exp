@@ -1,0 +1,23 @@
+load("@protobuf//bazel:cc_proto_library.bzl", "cc_proto_library")
+load("@rules_proto//proto:defs.bzl", "proto_library")
+
+proto_library(
+    name = "calibration_data",
+    srcs = ["calibration_data.proto"],
+)
+
+cc_proto_library(
+    name = "calibration_data_cc",
+    deps = [":calibration_data"],
+)
+
+cc_library(
+    name = "proto_utils",
+    srcs = ["proto_utils.cc"],
+    hdrs = ["proto_utils.h"],
+    deps = [
+        ":calibration_data_cc",
+        "@absl//absl/status:statusor",
+        "@absl//absl/strings",
+    ],
+)
