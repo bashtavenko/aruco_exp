@@ -21,3 +21,16 @@ cc_library(
         "@absl//absl/strings",
     ],
 )
+
+cc_test(
+    name = "proto_utils_test",
+    srcs = ["proto_utils_test.cc"],
+    data = ["//testdata"],
+    deps = [
+        ":proto_utils",
+        "@absl//absl/status:status_matchers",
+        "@bazel_tools//tools/cpp/runfiles",
+        "@googletest//:gtest_main",
+        "@protobuf-matchers//protobuf-matchers",
+    ],
+)
