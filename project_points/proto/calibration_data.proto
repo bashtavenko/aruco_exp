@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package aruco_exp.proto;
+package aruco.proto;
 
 //  THE camera matrix
 message CameraMatrix {

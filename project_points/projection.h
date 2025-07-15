@@ -9,6 +9,11 @@
 
 namespace aruco {
 
+struct IntrinsicCalibration {
+  cv::Mat camera_matrix;
+  cv::Mat distortion_params;
+};
+
 // Detects Aruco corners in the map for the given dictionary.
 // It can return 0..4 detected points
 std::unordered_map<int32_t, cv::Point>DetectArucoPoints(const cv::Mat& image,

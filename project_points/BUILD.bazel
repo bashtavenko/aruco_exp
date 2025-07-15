@@ -50,3 +50,28 @@ cc_binary(
         "@status_macros",
     ],
 )
+
+cc_library(
+    name = "proto_utils",
+    srcs = ["proto_utils.cc"],
+    hdrs = ["proto_utils.h"],
+    deps = [
+        "//project_points:projection",
+        "//project_points/proto:calibration_data_cc",
+        "@absl//absl/status:statusor",
+        "@absl//absl/strings",
+    ],
+)
+
+cc_test(
+    name = "proto_utils_test",
+    srcs = ["proto_utils_test.cc"],
+    data = ["//testdata"],
+    deps = [
+        ":proto_utils",
+        "@absl//absl/status:status_matchers",
+        "@bazel_tools//tools/cpp/runfiles",
+        "@googletest//:gtest_main",
+        "@protobuf-matchers//protobuf-matchers",
+    ],
+)
