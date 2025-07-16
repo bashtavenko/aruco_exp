@@ -1,13 +1,16 @@
 #include "projection.h"
 #include <vector>
+#include "absl/status/status_matchers.h"
 #include "gmock/gmock-matchers.h"
 #include "gtest/gtest.h"
 #include "opencv2/opencv.hpp"
+#include "project_points/proto_utils.h"
 #include "tools/cpp/runfiles/runfiles.h"
 
 namespace aruco {
 namespace {
 
+using ::absl_testing::IsOk;
 using ::bazel::tools::cpp::runfiles::Runfiles;
 
 TEST(ArucoDetection, Works) {
@@ -23,25 +26,24 @@ TEST(ArucoDetection, Works) {
 }
 
 TEST(Projection, Works) {
-  cv::Mat camera_matrix = cv::Mat::zeros(3, 3, CV_64FC1);
-  camera_matrix.at<double>(0, 0) = 1419.35339;  // fx
-  camera_matrix.at<double>(0, 2) = 574.24585;   // cx
-  camera_matrix.at<double>(1, 1) = 1424.77661;  // fy
-  camera_matrix.at<double>(1, 2) = 953.413879;  // cy
-  camera_matrix.at<double>(2, 2) = 1.;
-  cv::Mat distortion_parameters = cv::Mat::zeros(1, 5, CV_64FC1);
+  const Runfiles* files = Runfiles::CreateForTest();
+  auto proto = LoadIntrinsicFromTextProtoFile(
+      files->Rlocation("_main/testdata/pixel_6a_calibration.txtpb"));
+  EXPECT_THAT(proto, IsOk());
+  IntrinsicCalibration calibration =
+      ConvertIntrinsicCalibrationFromProto(proto.value());
 
   std::vector<cv::Point2f> source_image_points = {
       cv::Point2f(430, 149), cv::Point2f(1384, 167), cv::Point2f(1381, 877),
       cv::Point2f(423, 873)};
   std::vector<cv::Point3f> source_object_points = {
-    cv::Point3f(0, 0, 0), cv::Point3f(320, 0, 0), cv::Point3f(320, 250, 0),
-    cv::Point3f(0, 250, 0)};
+      cv::Point3f(0, 0, 0), cv::Point3f(320, 0, 0), cv::Point3f(320, 250, 0),
+      cv::Point3f(0, 250, 0)};
 
   std::vector<cv::Point3f> target_source_points = {cv::Point3f(110, 100, 0)};
 
-  auto result = ProjectPoints(camera_matrix, distortion_parameters,
-    source_object_points, source_image_points, target_source_points);
+  auto result = ProjectPoints(calibration, source_object_points,
+                              source_image_points, target_source_points);
   ASSERT_TRUE(result.ok());
   std::vector<cv::Point2f> image_points = result.value();
   EXPECT_THAT(image_points, testing::SizeIs(1));

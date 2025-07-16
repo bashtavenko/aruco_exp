@@ -20,8 +20,7 @@ std::unordered_map<int32_t, cv::Point>DetectArucoPoints(const cv::Mat& image,
   const cv::aruco::Dictionary& dictionary);
 
 // Projects source object points to the taget and returns image points.
-absl::StatusOr<std::vector<cv::Point2f>> ProjectPoints(const cv::Mat& camera_matrix,
-  const cv::Mat& distortion_params,
+absl::StatusOr<std::vector<cv::Point2f>> ProjectPoints(const IntrinsicCalibration& calibration,
   const std::vector<cv::Point3f>& source_object_points,
   const std::vector<cv::Point2f>& source_image_points,
   const std::vector<cv::Point3f>& target_object_points);

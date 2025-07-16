@@ -14,6 +14,8 @@ cc_test(
     data = ["//testdata"],
     deps = [
         ":projection",
+        ":proto_utils",
+        "@absl//absl/status:status_matchers",
         "@bazel_tools//tools/cpp/runfiles",
         "@googletest//:gtest_main",
     ],
@@ -40,11 +42,14 @@ cc_binary(
     srcs = ["projection_main.cc"],
     data = ["//testdata"],
     deps = [
+        ":highgui_utils",
         ":projection",
+        ":proto_utils",
         "//:opencv",
         "@absl//absl/flags:flag",
         "@absl//absl/flags:parse",
         "@absl//absl/status",
+        "@absl//absl/strings",
         "@gflags",
         "@glog",
         "@status_macros",
@@ -73,5 +78,15 @@ cc_test(
         "@bazel_tools//tools/cpp/runfiles",
         "@googletest//:gtest_main",
         "@protobuf-matchers//protobuf-matchers",
+    ],
+)
+
+cc_library(
+    name = "highgui_utils",
+    srcs = ["highgui_utils.cc"],
+    hdrs = ["highgui_utils.h"],
+    deps = [
+        "//:opencv",
+        "@absl//absl/strings",
     ],
 )

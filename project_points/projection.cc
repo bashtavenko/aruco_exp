@@ -5,26 +5,22 @@
 namespace aruco {
 
 absl::StatusOr<std::vector<cv::Point2f>> ProjectPoints(
-    const cv::Mat& camera_matrix, const cv::Mat& distortion_params,
+    const IntrinsicCalibration& calibration,
     const std::vector<cv::Point3f>& source_object_points,
     const std::vector<cv::Point2f>& source_image_points,
     const std::vector<cv::Point3f>& target_object_points) {
-
   cv::Mat rvec;
   cv::Mat tvec;
   auto result = cv::solvePnP(source_object_points, source_image_points,
-                             camera_matrix, distortion_params, rvec, tvec);
-
-  // auto result = cv::solvePnPRansac(source_object_points, source_image_points,
-  //                            camera_matrix, distortion_params, rvec, tvec);
-
+                             calibration.camera_matrix,
+                             calibration.distortion_params, rvec, tvec);
   if (!result) {
     return absl::InternalError("Failed to recover camera pose.");
   }
 
   std::vector<cv::Point2f> image_points;
-  cv::projectPoints(target_object_points, rvec, tvec,
-    camera_matrix, distortion_params, image_points);
+  cv::projectPoints(target_object_points, rvec, tvec, calibration.camera_matrix,
+                    calibration.distortion_params, image_points);
 
   return image_points;
 }
