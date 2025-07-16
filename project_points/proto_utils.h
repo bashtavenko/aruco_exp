@@ -5,11 +5,14 @@
 #include "absl/strings/string_view.h"
 #include "project_points/projection.h"
 #include "project_points/proto/calibration_data.pb.h"
+#include "project_points/proto/manifest.pb.h"
 
 namespace aruco {
 
 absl::StatusOr<aruco::proto::IntrinsicCalibration>
 LoadIntrinsicFromTextProtoFile(absl::string_view file_path);
+
+absl::StatusOr<aruco::proto::Context>LoadContextFromProtoFile(absl::string_view file_path);
 
 IntrinsicCalibration ConvertIntrinsicCalibrationFromProto(
   const aruco::proto::IntrinsicCalibration& proto);

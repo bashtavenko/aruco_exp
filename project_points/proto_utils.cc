@@ -22,6 +22,23 @@ LoadIntrinsicFromTextProtoFile(absl::string_view file_path) {
   return proto;
 }
 
+absl::StatusOr<aruco::proto::Context> LoadContextFromProtoFile(
+    absl::string_view file_path) {
+  std::ifstream file(file_path.data());
+  std::string text_proto((std::istreambuf_iterator<char>(file)),
+                         std::istreambuf_iterator<char>());
+  if (text_proto.empty()) {
+    return absl::InvalidArgumentError(
+        absl::StrCat("No file_path - ", file_path));
+  }
+  aruco::proto::Context proto;
+  if (!google::protobuf::TextFormat::ParseFromString(text_proto.data(),
+                                                     &proto)) {
+    return absl::InternalError("Failed to parse proto message");
+  }
+  return proto;
+}
+
 IntrinsicCalibration ConvertIntrinsicCalibrationFromProto(
     const aruco::proto::IntrinsicCalibration& proto) {
   IntrinsicCalibration result;

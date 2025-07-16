@@ -63,6 +63,7 @@ cc_library(
     deps = [
         "//project_points:projection",
         "//project_points/proto:calibration_data_cc",
+        "//project_points/proto:manifest_cc",
         "@absl//absl/status:statusor",
         "@absl//absl/strings",
     ],

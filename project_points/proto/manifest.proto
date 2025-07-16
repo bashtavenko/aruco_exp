@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package aruco.proto;
+
+// Represents world coordinates in some sort of coordinate space. Typically the
+// world is planar and z = 0.
+message ObjectPoint {
+  float x = 1;
+  float y = 2;
+  float z = 3;
+  string tag = 4;
+}
+
+// A some sort of physical item that can live in the context
+message Item {
+  int32 id = 1;
+  string name = 2;
+  int32 count = 3; // Number of this item instances in the context
+}
+
+// Linkage of where a given item exist in the context
+message ItemPositions {
+  Item item = 1;
+  ObjectPoint point = 2;
+}
+
+// World to be represented. Has multiple object points to represent boundary
+// This can be at least four object points but it could be more. At least
+// the boundary are guaranteed to be be convex haul.
+message Context {
+  repeated ObjectPoint point = 1;             // World with boundaries
+  repeated ItemPositions item_position = 2;   // Items
+}

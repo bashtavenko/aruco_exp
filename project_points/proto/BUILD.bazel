@@ -12,3 +12,13 @@ cc_proto_library(
     name = "calibration_data_cc",
     deps = [":calibration_data"],
 )
+
+proto_library(
+    name = "manifest",
+    srcs = ["manifest.proto"],
+)
+
+cc_proto_library(
+    name = "manifest_cc",
+    deps = [":manifest"],
+)
