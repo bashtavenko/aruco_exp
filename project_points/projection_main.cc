@@ -147,8 +147,10 @@ absl::Status Run() {
   const std::string file_path = absl::GetFlag(FLAGS_image_or_video_path);
   const aruco::FileType file_type = aruco::GetFileType(file_path);
 
-  ASSIGN_OR_RETURN(auto proto, aruco::LoadIntrinsicFromTextProtoFile(
-                                   absl::GetFlag(FLAGS_calibration_path)));
+  ASSIGN_OR_RETURN(
+      auto proto,
+      aruco::LoadFromTextProtoFile<aruco::proto::IntrinsicCalibration>(
+          absl::GetFlag(FLAGS_calibration_path)));
   aruco::IntrinsicCalibration calibration =
       aruco::ConvertIntrinsicCalibrationFromProto(proto);
 

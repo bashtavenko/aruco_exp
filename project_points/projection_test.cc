@@ -27,7 +27,7 @@ TEST(ArucoDetection, Works) {
 
 TEST(Projection, Works) {
   const Runfiles* files = Runfiles::CreateForTest();
-  auto proto = LoadIntrinsicFromTextProtoFile(
+  auto proto = aruco::LoadFromTextProtoFile<aruco::proto::IntrinsicCalibration>(
       files->Rlocation("_main/testdata/pixel_6a_calibration.txtpb"));
   EXPECT_THAT(proto, IsOk());
   IntrinsicCalibration calibration =

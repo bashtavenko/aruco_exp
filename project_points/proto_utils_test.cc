@@ -24,7 +24,8 @@ TEST(LoadFromTextProto, Works) {
   const std::string text_proto_file_path =
       files->Rlocation("_main/testdata/pixel_6a_calibration.txtpb");
 
-  EXPECT_THAT(LoadIntrinsicFromTextProtoFile(text_proto_file_path),
+  EXPECT_THAT(LoadFromTextProtoFile<aruco::proto::IntrinsicCalibration>(
+                  text_proto_file_path),
               IsOkAndHolds(EqualsProto(
                   R"pb(camera_matrix {
                          fx: 1419.35339
@@ -45,8 +46,9 @@ TEST(LoadFromTextProto, Works) {
 
 TEST(LoadFromTextProtoAndConvert, Works) {
   const Runfiles* files = Runfiles::CreateForTest();
-  auto intrinsic_proto = LoadIntrinsicFromTextProtoFile(
-      files->Rlocation("_main/testdata/pixel_6a_calibration.txtpb"));
+  auto intrinsic_proto =
+      LoadFromTextProtoFile<aruco::proto::IntrinsicCalibration>(
+          files->Rlocation("_main/testdata/pixel_6a_calibration.txtpb"));
   ASSERT_THAT(intrinsic_proto, IsOk());
 
   const auto intrinsic =
