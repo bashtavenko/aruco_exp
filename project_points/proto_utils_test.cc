@@ -12,6 +12,8 @@ using ::absl_testing::IsOk;
 using ::absl_testing::IsOkAndHolds;
 using ::bazel::tools::cpp::runfiles::Runfiles;
 using ::protobuf_matchers::EqualsProto;
+using ::protobuf_matchers::Partially;
+using ::testing::Eq;
 
 MATCHER_P2(CompareMat, a, b, "") {
   cv::Mat difference;
@@ -62,5 +64,48 @@ TEST(LoadFromTextProtoAndConvert, Works) {
   EXPECT_THAT(0.1,
               CompareMat(intrinsic.distortion_params, want_distortion_params));
 }
+
+TEST(LoadFromTextManifestProto, Works) {
+  const Runfiles* files = Runfiles::CreateForTest();
+  const std::string text_proto_file_path =
+      files->Rlocation("_main/testdata/simple_manifest.txtpb");
+
+  // With Partially it at least validates the protobuf conversion from text
+  EXPECT_THAT(
+      LoadFromTextProtoFile<aruco::proto::Context>(text_proto_file_path),
+      IsOkAndHolds(Partially(EqualsProto(
+          R"pb(
+            points { x: 0 y: 0 z: 0 tag: "tl" }
+            points { x: 320 y: 0 z: 0 tag: "tr" }
+            points { x: 320 y: 250 z: 0 tag: "br" }
+            points { x: 0 y: 250 z: 0 tag: "bl" }
+          )pb"))));
+}
+
+TEST(ConvertContextToObjectPoints, Works) {
+  const Runfiles* files = Runfiles::CreateForTest();
+  auto context = LoadFromTextProtoFile<aruco::proto::Context>(
+      files->Rlocation("_main/testdata/simple_manifest.txtpb"));
+  // TODO: Test ASSIGN_OR. Similar to ASSIGN_OR_RETURN in status macros
+  ASSERT_THAT(context, IsOk());
+
+  const std::vector<cv::Point3f> want_object_points = {
+      cv::Point3f(0, 0, 0), cv::Point3f(320, 0, 0), cv::Point3f(320, 250, 0),
+      cv::Point3f(0, 250, 0)};
+  EXPECT_THAT(ConvertContextToObjectPoints(context.value()),
+              Eq(want_object_points));
+}
+
+TEST(ConvertContextToItemPoints, Works) {
+  const Runfiles* files = Runfiles::CreateForTest();
+  auto context = LoadFromTextProtoFile<aruco::proto::Context>(
+      files->Rlocation("_main/testdata/simple_manifest.txtpb"));
+  ASSERT_THAT(context, IsOk());
+  const std::unordered_map<int32_t, cv::Point3f> want_item_points = {
+      {1, cv::Point3f(110, 100, 0)}};
+  EXPECT_THAT(ConvertContextToItemPoints(context.value()),
+              Eq(want_item_points));
+}
+
 }  // namespace
 }  // namespace aruco

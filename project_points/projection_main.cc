@@ -20,6 +20,9 @@ ABSL_FLAG(std::string, image_or_video_path, "testdata/frame_0.jpg",
 ABSL_FLAG(std::string, calibration_path, "testdata/pixel_6a_calibration.txtpb",
           "Intrinsic camera calibration");
 
+ABSL_FLAG(std::string, manifest_path, "testdata/simple_manifest.txtpb",
+          "Manifest text proto file");
+
 ABSL_FLAG(std::string, output_video_path, "", "Output of projection");
 
 const cv::aruco::Dictionary kDictionary =

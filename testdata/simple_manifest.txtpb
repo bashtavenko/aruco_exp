@@ -1,0 +1,36 @@
+points {
+  x: 0
+  y: 0
+  z: 0
+  tag: "tl"
+}
+points {
+  x: 320
+  y: 0
+  z: 0
+  tag: "tr"
+}
+points {
+  x: 320
+  y: 250
+  z: 0
+  tag: "br"
+}
+points {
+  x: 0
+  y: 250
+  z: 0
+  tag: "bl"
+}
+items {
+  id: 1
+  name: "Sticky Notes"
+  count: 1
+}
+item_points {
+  item_id: 1
+  point {
+    x: 110
+    y: 100
+  }
+}

@@ -18,9 +18,17 @@ message Item {
   int32 count = 3; // Number of this item instances in the context
 }
 
+// Rectangle inside of the context.
+message Pocket {
+  ObjectPoint top_left_corner = 1;
+  float height = 2;
+  float width = 3;
+  int32 id = 4;
+}
+
 // Linkage of where a given item exist in the context
 message ItemPositions {
-  Item item = 1;
+  int32 item_id = 1;
   ObjectPoint point = 2;
 }
 
@@ -28,6 +36,8 @@ message ItemPositions {
 // This can be at least four object points but it could be more. At least
 // the boundary are guaranteed to be be convex haul.
 message Context {
-  repeated ObjectPoint point = 1;             // World with boundaries
-  repeated ItemPositions item_position = 2;   // Items
+  repeated ObjectPoint points = 1;             // World with boundaries
+  repeated Item items = 2;
+  repeated ItemPositions item_points = 3;   // Items
+  repeated Pocket pockets = 4;                 // Pockets
 }

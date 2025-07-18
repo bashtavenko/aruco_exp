@@ -37,4 +37,23 @@ IntrinsicCalibration ConvertIntrinsicCalibrationFromProto(
   return result;
 }
 
+std::vector<cv::Point3f> ConvertContextToObjectPoints(
+    const aruco::proto::Context& proto) {
+  std::vector<cv::Point3f> result;
+  for (const auto& point : proto.points()) {
+    result.push_back(cv::Point3f(point.x(), point.y(), point.z()));
+  }
+  return result;
+}
+
+std::unordered_map<std::int32_t, cv::Point3f> ConvertContextToItemPoints(
+    const aruco::proto::Context& proto) {
+  std::unordered_map<std::int32_t, cv::Point3f> result;
+  for (const auto& item_point : proto.item_points()) {
+    result[item_point.item_id()] = cv::Point3f(
+        item_point.point().x(), item_point.point().y(), item_point.point().z());
+  }
+  return result;
+}
+
 }  // namespace aruco

@@ -14,6 +14,23 @@ struct IntrinsicCalibration {
   cv::Mat distortion_params;
 };
 
+struct ObjectPoint {
+  cv::Point3f point;
+  std::string tag;
+};
+
+struct Item {
+  int32_t id;
+  std::string name;
+  size_t count;
+};
+
+struct ItemObjectPoint {
+  int32_t id;
+  cv::Point3f object_point;
+};
+
+
 // Detects Aruco corners in the map for the given dictionary.
 // It can return 0..4 detected points
 std::unordered_map<int32_t, cv::Point>DetectArucoPoints(const cv::Mat& image,
