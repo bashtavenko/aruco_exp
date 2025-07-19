@@ -30,6 +30,12 @@ struct ItemObjectPoint {
   cv::Point3f object_point;
 };
 
+struct Context {
+  std::vector<ObjectPoint> object_points;
+  std::vector<Item> items;
+  std::vector<ItemObjectPoint> item_points;
+};
+
 
 // Detects Aruco corners in the map for the given dictionary.
 // It can return 0..4 detected points

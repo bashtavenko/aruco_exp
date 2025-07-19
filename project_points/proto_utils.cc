@@ -37,23 +37,20 @@ IntrinsicCalibration ConvertIntrinsicCalibrationFromProto(
   return result;
 }
 
-std::vector<cv::Point3f> ConvertContextToObjectPoints(
-    const aruco::proto::Context& proto) {
-  std::vector<cv::Point3f> result;
+Context ConvertContextFromProto(const aruco::proto::Context& proto) {
+  Context result;
   for (const auto& point : proto.points()) {
-    result.push_back(cv::Point3f(point.x(), point.y(), point.z()));
+    result.object_points.emplace_back(
+        ObjectPoint{.point = cv::Point3f(point.x(), point.y(), point.z()),
+                    .tag = point.tag()});
   }
-  return result;
-}
-
-std::unordered_map<std::int32_t, cv::Point3f> ConvertContextToItemPoints(
-    const aruco::proto::Context& proto) {
-  std::unordered_map<std::int32_t, cv::Point3f> result;
   for (const auto& item_point : proto.item_points()) {
-    result[item_point.item_id()] = cv::Point3f(
-        item_point.point().x(), item_point.point().y(), item_point.point().z());
+    result.item_points.emplace_back(ItemObjectPoint{
+        .id = item_point.item_id(),
+        .object_point =
+            cv::Point3f(item_point.point().x(), item_point.point().y(),
+                        item_point.point().z())});
   }
   return result;
 }
-
 }  // namespace aruco

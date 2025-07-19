@@ -82,29 +82,26 @@ TEST(LoadFromTextManifestProto, Works) {
           )pb"))));
 }
 
-TEST(ConvertContextToObjectPoints, Works) {
+TEST(ConvertContextFromProto, Works) {
   const Runfiles* files = Runfiles::CreateForTest();
-  auto context = LoadFromTextProtoFile<aruco::proto::Context>(
+  auto manifest = LoadFromTextProtoFile<aruco::proto::Context>(
       files->Rlocation("_main/testdata/simple_manifest.txtpb"));
   // TODO: Test ASSIGN_OR. Similar to ASSIGN_OR_RETURN in status macros
-  ASSERT_THAT(context, IsOk());
+  ASSERT_THAT(manifest, IsOk());
 
-  const std::vector<cv::Point3f> want_object_points = {
-      cv::Point3f(0, 0, 0), cv::Point3f(320, 0, 0), cv::Point3f(320, 250, 0),
-      cv::Point3f(0, 250, 0)};
-  EXPECT_THAT(ConvertContextToObjectPoints(context.value()),
-              Eq(want_object_points));
-}
+    const Context want_context = {
+    .object_points = {
+      {cv::Point3f(0, 0, 0), "tl"},
+      {cv::Point3f(320, 0, 0), "tr"},
+      {cv::Point3f(320, 250, 0), "br",},
+        {cv::Point3f(0, 250, 0), "bl"}},
+    .item_points = {{1, cv::Point3f(110, 100, 0)}}
+  };
 
-TEST(ConvertContextToItemPoints, Works) {
-  const Runfiles* files = Runfiles::CreateForTest();
-  auto context = LoadFromTextProtoFile<aruco::proto::Context>(
-      files->Rlocation("_main/testdata/simple_manifest.txtpb"));
-  ASSERT_THAT(context, IsOk());
-  const std::unordered_map<int32_t, cv::Point3f> want_item_points = {
-      {1, cv::Point3f(110, 100, 0)}};
-  EXPECT_THAT(ConvertContextToItemPoints(context.value()),
-              Eq(want_item_points));
+   // TODO: Add struct inequality operator
+   auto result = ConvertContextFromProto(manifest.value());
+   EXPECT_THAT(result.object_points, testing::SizeIs(4));
+   EXPECT_THAT(result.item_points, testing::SizeIs(1));
 }
 
 }  // namespace

@@ -43,6 +43,9 @@ absl::StatusOr<ProtoType> LoadFromTextProtoFile(absl::string_view file_path) {
 IntrinsicCalibration ConvertIntrinsicCalibrationFromProto(
     const aruco::proto::IntrinsicCalibration& proto);
 
+// Converts manifest proto into context
+Context ConvertContextFromProto(const aruco::proto::Context& proto);
+
 // Writes proto to the text proto
 template <typename ProtoType>
 absl::StatusOr<std::string> WriteProtoToTextProto(ProtoType proto,
@@ -60,11 +63,7 @@ absl::StatusOr<std::string> WriteProtoToTextProto(ProtoType proto,
   return text_format;
 }
 
-std::vector<cv::Point3f> ConvertContextToObjectPoints(
-    const aruco::proto::Context& proto);
 
-std::unordered_map<std::int32_t, cv::Point3f> ConvertContextToItemPoints(
-    const aruco::proto::Context& proto);
 
 }  // namespace aruco
 

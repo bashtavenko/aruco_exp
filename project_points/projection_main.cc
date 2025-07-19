@@ -1,3 +1,4 @@
+#include <oneapi/tbb/detail/_task.h>
 #include <filesystem>
 #include <unordered_set>
 #include "absl/flags/flag.h"
@@ -25,15 +26,12 @@ ABSL_FLAG(std::string, manifest_path, "testdata/simple_manifest.txtpb",
 
 ABSL_FLAG(std::string, output_video_path, "", "Output of projection");
 
-const cv::aruco::Dictionary kDictionary =
-    cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_250);
-
-const std::vector<cv::Point3f> source_object_points = {
-    cv::Point3f(0, 0, 0), cv::Point3f(320, 0, 0), cv::Point3f(320, 250, 0),
-    cv::Point3f(0, 250, 0)};
-
+// Projects points for the given image. Mutates image.
 absl::Status ProcessImage(const cv::Mat& image,
-                          const aruco::IntrinsicCalibration& calibration) {
+                          const aruco::IntrinsicCalibration& calibration,
+                          const aruco::Context& context) {
+  const cv::aruco::Dictionary kDictionary =
+      cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_250);
   const std::unordered_map<int32_t, cv::Point> detected_points =
       aruco::DetectArucoPoints(image, kDictionary);
   const std::vector<cv::Scalar> corner_colors = {
@@ -45,7 +43,17 @@ absl::Status ProcessImage(const cv::Mat& image,
   }
   if (detected_points.size() != 4) return absl::OkStatus();
 
-  std::vector<cv::Point3f> target_source_points = {cv::Point3f(110, 100, 0)};
+  // Getting from context
+  std::vector<cv::Point3f> source_object_points;
+  for (const auto& object_point : context.object_points) {
+    source_object_points.emplace_back(object_point.point);
+  }
+
+  // TODO: Ignore ID so far
+  std::vector<cv::Point3f> target_source_points;
+  for (const auto& item_point : context.item_points) {
+    target_source_points.emplace_back(item_point.object_point);
+  }
   std::vector<cv::Point2f> source_image_points;
   for (int i = 1; i <= 4; ++i) {
     source_image_points.emplace_back(detected_points.at(i));
@@ -62,13 +70,15 @@ absl::Status ProcessImage(const cv::Mat& image,
   return absl::OkStatus();
 }
 
-absl::Status RunImage(const aruco::IntrinsicCalibration& calibration) {
+// Process image and outputs to cv::imShow
+absl::Status RunImage(const aruco::IntrinsicCalibration& calibration,
+                      const aruco::Context& context) {
   const cv::Mat image = cv::imread(absl::GetFlag(FLAGS_image_or_video_path));
   if (image.empty()) {
     return absl::InvalidArgumentError(absl::StrFormat(
         "Failed to open image '%s'", absl::GetFlag(FLAGS_image_or_video_path)));
   }
-  RETURN_IF_ERROR(ProcessImage(image, calibration));
+  RETURN_IF_ERROR(ProcessImage(image, calibration, context));
 
   constexpr absl::string_view kWindow = "Detection";
   cv::namedWindow(kWindow.data(), cv::WINDOW_FREERATIO);
@@ -78,7 +88,9 @@ absl::Status RunImage(const aruco::IntrinsicCalibration& calibration) {
   return absl::OkStatus();
 }
 
-absl::Status RunVideo(const aruco::IntrinsicCalibration& calibration) {
+// Runs video. Shows in cv::imShow and can write output video.
+absl::Status RunVideo(const aruco::IntrinsicCalibration& calibration,
+                      const aruco::Context& context) {
   cv::VideoCapture cap(absl::GetFlag(FLAGS_image_or_video_path));
   if (!cap.isOpened()) {
     return absl::InvalidArgumentError(absl::StrFormat(
@@ -119,7 +131,7 @@ absl::Status RunVideo(const aruco::IntrinsicCalibration& calibration) {
 
     ++frame_count;
     int64_t start_ticks = cv::getTickCount();
-    auto status = ProcessImage(frame, calibration);
+    auto status = ProcessImage(frame, calibration, context);
     const int64_t end_ticks = cv::getTickCount();
 
     if (!status.ok()) {
@@ -157,13 +169,18 @@ absl::Status Run() {
   aruco::IntrinsicCalibration calibration =
       aruco::ConvertIntrinsicCalibrationFromProto(proto);
 
+  ASSIGN_OR_RETURN(auto manifest,
+                   aruco::LoadFromTextProtoFile<aruco::proto::Context>(
+                       absl::GetFlag(FLAGS_manifest_path)));
+  const aruco::Context& context = aruco::ConvertContextFromProto(manifest);
+
   switch (file_type) {
     case kImage: {
       cv::Mat image = cv::imread(file_path);
       if (image.empty()) {
         return absl::InvalidArgumentError("Failed to load image: " + file_path);
       }
-      RETURN_IF_ERROR(RunImage(calibration));
+      RETURN_IF_ERROR(RunImage(calibration, context));
       break;
     }
     case kVideo: {
@@ -171,7 +188,7 @@ absl::Status Run() {
       if (!cap.isOpened()) {
         return absl::InvalidArgumentError("Failed to open video: " + file_path);
       }
-      RETURN_IF_ERROR(RunVideo(calibration));
+      RETURN_IF_ERROR(RunVideo(calibration, context));
       break;
     }
     case kUnknown:
