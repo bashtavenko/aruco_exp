@@ -23,6 +23,8 @@ ABSL_FLAG(std::string, detector_type, "aruco",
 absl::Status DetectArucoRun(const cv::Mat& image) {
   const cv::aruco::Dictionary dictionary =
       cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_250);
+
+  LOG(INFO) << "Image size: " << image.size;
   const std::unordered_map<int32_t, cv::Point> detected_points =
       aruco::DetectArucoPoints(image, dictionary);
   for (const auto& [id, point] : detected_points) {
@@ -68,6 +70,7 @@ absl::Status DetectCorners(const cv::Mat& image) {
   cv::namedWindow(kWindow.data(), cv::WINDOW_FREERATIO);
   cv::imshow(kWindow.data(), image);
   cv::waitKey(0);
+  return absl::OkStatus();
 }
 
 absl::Status Run() {

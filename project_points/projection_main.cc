@@ -42,6 +42,9 @@ absl::Status ProcessImage(const cv::Mat& image,
     }
   }
   if (detected_points.size() != 4) return absl::OkStatus();
+  if (detected_points.size() == 4) {
+    LOG(INFO) << "LOCK";
+  }
 
   // Getting from context
   std::vector<cv::Point3f> source_object_points;
@@ -104,6 +107,8 @@ absl::Status RunVideo(const aruco::IntrinsicCalibration& calibration,
       static_cast<int>(cap.get(cv::CAP_PROP_FRAME_HEIGHT));
   double fps = cap.get(cv::CAP_PROP_FPS);
   if (fps <= 0) fps = 30.0;  // Default fallback
+  LOG(INFO) << absl::StreamFormat("FPS: %.0f, %.0fx%.0f", fps, frame_width,
+                                  frame_height);
 
   cv::VideoWriter writer;
   if (!absl::GetFlag(FLAGS_output_video_path).empty()) {
