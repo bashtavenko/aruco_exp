@@ -1,3 +1,7 @@
+// Demo
+// bazel run //project_points:projection_main --
+// --image_or_video_path=testdata/local/real_tray/scan.mp4
+// --manifest_path=testdata/local/real_tray/real_manifest.txtpb
 #include <oneapi/tbb/detail/_task.h>
 #include <filesystem>
 #include <unordered_set>
@@ -15,7 +19,7 @@
 #include "project_points/proto_utils.h"
 #include "status_macros.h"
 
-ABSL_FLAG(std::string, image_or_video_path, "testdata/frame_0.jpg",
+ABSL_FLAG(std::string, image_or_video_path, "testdata/scan.mp4",
           "Image or video input path");
 
 ABSL_FLAG(std::string, calibration_path, "testdata/pixel_6a_calibration.txtpb",
@@ -42,9 +46,6 @@ absl::Status ProcessImage(const cv::Mat& image,
     }
   }
   if (detected_points.size() != 4) return absl::OkStatus();
-  if (detected_points.size() == 4) {
-    LOG(INFO) << "LOCK";
-  }
 
   // Getting from context
   std::vector<cv::Point3f> source_object_points;
@@ -181,18 +182,11 @@ absl::Status Run() {
 
   switch (file_type) {
     case kImage: {
-      cv::Mat image = cv::imread(file_path);
-      if (image.empty()) {
-        return absl::InvalidArgumentError("Failed to load image: " + file_path);
-      }
       RETURN_IF_ERROR(RunImage(calibration, context));
       break;
     }
     case kVideo: {
       cv::VideoCapture cap(file_path);
-      if (!cap.isOpened()) {
-        return absl::InvalidArgumentError("Failed to open video: " + file_path);
-      }
       RETURN_IF_ERROR(RunVideo(calibration, context));
       break;
     }
