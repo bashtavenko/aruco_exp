@@ -8,15 +8,6 @@
 #include "opencv2/objdetect/aruco_dictionary.hpp"
 #include "project_points/highgui_utils.h"
 
-void Detect(const cv::aruco::ArucoDetector& detector, const cv::Mat& image) {
-  std::vector<int32_t> ids;
-  std::vector<std::vector<cv::Point2f>> corners;
-  detector.detectMarkers(image, corners, ids, cv::noArray());
-  if (!ids.empty()) {
-    cv::aruco::drawDetectedMarkers(image, corners, ids);
-  }
-}
-
 absl::Status Run() {
   cv::VideoCapture cap(0);
   if (!cap.isOpened()) {
@@ -52,10 +43,8 @@ absl::Status Run() {
   while (cap.read(frame)) {
     ++frame_count;
     const int64_t start_ticks = cv::getTickCount();
-
     detect(frame);
     cv::imshow("Scanner", frame);
-
     const int64_t end_ticks = cv::getTickCount();
     total_processing_ticks += (end_ticks - start_ticks);
 
