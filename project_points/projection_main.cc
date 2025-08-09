@@ -40,14 +40,14 @@ absl::Status ProcessImage(const cv::Mat& image,
       aruco::DetectArucoPoints(image, kDictionary);
   const std::vector<cv::Scalar> corner_colors = {
       aruco::kMAGENTA, aruco::kCYAN, aruco::kYELLOW, aruco::kORANGE};
-  for (int i = 1; i <= 4; ++i) {
-    if (detected_points.contains(i)) {
-      aruco::DrawCircle(image, detected_points.at(i), corner_colors[i - 1]);
-    }
+  for (const auto& [id, point] : detected_points) {
+    aruco::DrawCircle(image, point, corner_colors[id - 1]);
   }
   if (detected_points.size() != 4) return absl::OkStatus();
+  // Camera pose found
 
-  // Getting from context
+  // Getting object and target object point and other information from
+  // context.
   std::vector<cv::Point3f> source_object_points;
   for (const auto& object_point : context.object_points) {
     source_object_points.emplace_back(object_point.point);
