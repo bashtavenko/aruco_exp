@@ -126,15 +126,7 @@ absl::Status RunVideo(const aruco::IntrinsicCalibration& calibration,
 
   int32_t frame_count = 0;
   int64_t total_processing_ticks = 0;
-  for (;;) {
-    if (!cap.read(frame)) {
-      break;  // End of video or read error
-    }
-
-    if (frame.empty()) {
-      break;  // Safety check
-    }
-
+  while (cap.read(frame)) {
     ++frame_count;
     int64_t start_ticks = cv::getTickCount();
     auto status = ProcessImage(frame, calibration, context);

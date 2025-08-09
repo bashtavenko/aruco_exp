@@ -92,3 +92,18 @@ cc_binary(
         "@status_macros",
     ],
 )
+
+cc_binary(
+    name = "scanner_main",
+    srcs = ["scanner_main.cc"],
+    deps = [
+        "//:opencv",
+        "//project_points:highgui_utils",
+        "@absl//absl/flags:flag",
+        "@absl//absl/flags:parse",
+        "@absl//absl/status",
+        "@gflags",
+        "@glog",
+        "@status_macros",
+    ],
+)
