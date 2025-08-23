@@ -15,8 +15,8 @@ elif [ "$1" != "" ] && [ "$1" != "release" ]; then
 fi
 
 # Configuration
-OPENCV_VERSION="4.8.0"
-BUILD_DIR="$HOME/opencv_build"
+OPENCV_VERSION="4.11.0"
+BUILD_DIR="$HOME/opencv_build_411"
 if [ "$BUILD_TYPE" = "Debug" ]; then
     INSTALL_DIR="$BUILD_DIR/install_debug"
     BUILD_SUBDIR="build_debug"
@@ -25,7 +25,7 @@ else
     BUILD_SUBDIR="build"
 fi
 
-echo "Building OpenCV ${OPENCV_VERSION} with ArUco module in $BUILD_TYPE mode..."
+echo "Building OpenCV ${OPENCV_VERSION} in $BUILD_TYPE mode..."
 
 # Create and enter build directory
 mkdir -p "$BUILD_DIR"
@@ -58,25 +58,26 @@ cmake \
     -DWITH_QT=ON \
     -DBUILD_SHARED_LIBS=ON \
     -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
-    -DOPENCV_GENERATE_PKGCONFIG=ON \
     -DBUILD_TESTS=OFF \
     -DBUILD_PERF_TESTS=OFF \
     -DBUILD_EXAMPLES=OFF \
-    "../opencv-${OPENCV_VERSION}"
+     "../opencv-${OPENCV_VERSION}"
 
 echo "Building OpenCV..."
-make -j$(nproc)
+make -j$(sysctl -n hw.logicalcpu)
+
 
 echo "Installing OpenCV..."
 make install
 
-echo "Creating .408 version symlinks..."
+# Create symlinks for versioned libraries
+echo "Creating .so version symlinks..."
 cd "$INSTALL_DIR/lib"
-for lib in libopencv_*.so.4.8.0; do
+for lib in libopencv_*.so.4.11.0; do
     if [ -f "$lib" ]; then
-        base=$(basename "$lib" .so.4.8.0)
-        ln -sf "$lib" "${base}.so.408"
-        echo "Created symlink: ${base}.so.408 -> $lib"
+        base=$(basename "$lib" .so.4.11.0)
+        ln -sf "$lib" "${base}.so.4.11.0"
+        echo "Created symlink: ${base}.so.4.11.0 -> $lib"
     fi
 done
 
@@ -85,9 +86,7 @@ echo "Build completed successfully!"
 echo "Build type: $BUILD_TYPE"
 echo "Libraries installed in: $INSTALL_DIR/lib"
 echo "Headers installed in: $INSTALL_DIR/include"
-echo ""
-echo "Required libraries:"
-ls -la "$INSTALL_DIR/lib"/libopencv_*.so.408 2>/dev/null || echo "No .408 symlinks found"
+
 
 if [ "$BUILD_TYPE" = "Debug" ]; then
     echo ""

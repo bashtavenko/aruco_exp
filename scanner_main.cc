@@ -25,7 +25,7 @@ absl::Status Run() {
                                   frame_height);
 
   const cv::aruco::Dictionary dictionary =
-      cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_250);
+      cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_50);
   const auto detectorParams = cv::aruco::DetectorParameters();
   const cv::aruco::ArucoDetector detector(dictionary, detectorParams);
   auto detect = [&detector](const cv::Mat& image) {

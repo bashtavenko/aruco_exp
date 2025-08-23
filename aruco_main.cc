@@ -3,17 +3,17 @@
 #include "absl/status/status.h"
 #include "gflags/gflags.h"
 #include "glog/logging.h"
-#include "third_party/opencv/include/opencv2/core.hpp"
-#include "third_party/opencv/include/opencv2/highgui/highgui.hpp"
-#include "third_party/opencv/include/opencv2/objdetect/aruco_detector.hpp"
-#include "third_party/opencv/include/opencv2/objdetect/aruco_dictionary.hpp"
+#include "opencv2/core.hpp"
+#include "opencv2/highgui/highgui.hpp"
+#include "opencv2/objdetect/aruco_detector.hpp"
+#include "opencv2/objdetect/aruco_dictionary.hpp"
 
 absl::Status Run() {
   cv::Mat marker_image;
 
   cv::aruco::Dictionary dictionary =
-      cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_250);
-  cv::aruco::generateImageMarker(dictionary, 4, 100, marker_image, 1);
+      cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_50);
+  cv::aruco::generateImageMarker(dictionary, 8, 100, marker_image, 1);
   cv::imshow("Marker", marker_image);
   cv::waitKey(0);
   cv::destroyAllWindows();
