@@ -32,22 +32,22 @@ ABSL_FLAG(std::string, output_video_path, "", "Output of projection");
 absl::Status ProcessImage(const cv::Mat& image,
                           const aruco::IntrinsicCalibration& calibration,
                           const aruco::Context& context) {
-  const std::unordered_map<int32_t, cv::Point> detected_points =
-      aruco::DetectArucoPoints(image, context.dictionary);
-  const std::vector<cv::Scalar> corner_colors = {
-      aruco::kMAGENTA, aruco::kCYAN, aruco::kYELLOW, aruco::kORANGE};
-  for (const auto& [id, point] : detected_points) {
-    aruco::DrawCircle(image, point, corner_colors[id - 1]);
-  }
-  if (detected_points.size() != 4) return absl::OkStatus();
+  std::vector<aruco::Correspondence> match = aruco::DetectArucoPoints(
+      image, context.dictionary, context.object_points);
+  // const std::vector<cv::Scalar> corner_colors = {
+  //     aruco::kMAGENTA, aruco::kCYAN, aruco::kYELLOW, aruco::kORANGE};
+  // for (const auto& [id, point] : detected_points) {
+  //   aruco::DrawCircle(image, point, corner_colors[id - 1]);
+  // }
+  if (match.size() != 4) return absl::OkStatus();
   // Camera pose found
 
   // Getting object and target object point and other information from
   // context.
-  std::vector<cv::Point3f> source_object_points;
-  for (const auto& object_point : context.object_points) {
-    source_object_points.emplace_back(object_point.point);
-  }
+  // std::vector<cv::Point3f> source_object_points;
+  // for (const auto& object_point : context.object_points) {
+  //   source_object_points.emplace_back(object_point.point);
+  // }
 
   // TODO: Ignore ID so far
   std::vector<cv::Point3f> target_source_points;
@@ -55,8 +55,10 @@ absl::Status ProcessImage(const cv::Mat& image,
     target_source_points.emplace_back(item_point.object_point);
   }
   std::vector<cv::Point2f> source_image_points;
-  for (int i = 1; i <= 4; ++i) {
-    source_image_points.emplace_back(detected_points.at(i));
+  std::vector<cv::Point3f> source_object_points;
+  for (const auto& m : match) {
+    source_image_points.emplace_back(m.image_point);
+    source_object_points.emplace_back(m.object_point);
   }
   auto result = aruco::ProjectPoints(calibration, source_object_points,
                                      source_image_points, target_source_points);

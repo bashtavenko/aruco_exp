@@ -25,9 +25,10 @@ absl::StatusOr<std::vector<cv::Point2f>> ProjectPoints(
   return image_points;
 }
 
-std::unordered_map<int32_t, cv::Point> DetectArucoPoints(
-    const cv::Mat& image, const cv::aruco::Dictionary& dictionary) {
-  std::unordered_map<int32_t, cv::Point> detected_object_points;
+std::vector<Correspondence> DetectArucoPoints(
+    const cv::Mat& image, const cv::aruco::Dictionary& dictionary,
+    const std::vector<ObjectPoint>& object_points) {
+  std::vector<Correspondence> correspondences;
 
   std::vector<std::vector<cv::Point2f>> markerCorners, rejectedCandidates;
   cv::aruco::DetectorParameters detectorParams =
@@ -40,12 +41,21 @@ std::unordered_map<int32_t, cv::Point> DetectArucoPoints(
 
   detector.detectMarkers(image, corners, ids, rejected);
   for (int32_t i = 0; i < static_cast<int32_t>(corners.size()); ++i) {
-    int32_t marker_id = ids[i];
+    const int32_t marker_id = ids[i];
     cv::Rect bbox = cv::boundingRect(corners[i]);
-    cv::Point center = (bbox.tl() + bbox.br()) / 2;
-    detected_object_points[marker_id] = cv::Point(center.x, center.y);
+    const cv::Point center = (bbox.tl() + bbox.br()) / 2;
+    for (const auto& [point, tag] : object_points) {
+      // TODO: This may throw an exception if string is not integer.
+      if (std::stoi(tag) == marker_id) {
+        correspondences.emplace_back(Correspondence{
+            .id = marker_id,
+            .image_point = cv::Point(center.x, center.y),
+            .object_point = point,
+        });
+      }
+    }
   }
-  return detected_object_points;
+  return correspondences;
 }
 
 std::unordered_map<int32_t, cv::Point> DetectCorners(const cv::Mat& image) {

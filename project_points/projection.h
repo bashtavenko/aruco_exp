@@ -1,9 +1,9 @@
 #ifndef PROJECTION_H
 #define PROJECTION_H
+#include <unordered_map>
 #include "absl/status/statusor.h"
 #include "opencv2/calib3d.hpp"
 #include "opencv2/imgproc.hpp"
-#include <unordered_map>
 #include "opencv2/objdetect/aruco_dictionary.hpp"
 
 namespace aruco {
@@ -20,7 +20,7 @@ struct ObjectPoint {
 
 // Linkage of detected aruco image point and corresponding objection point;
 struct Correspondence {
-  std::string tag;
+  int32_t id;
   cv::Point2f image_point;
   cv::Point3f object_point;
 };
@@ -43,10 +43,14 @@ struct Context {
   cv::aruco::Dictionary dictionary;
 };
 
-// Detects Aruco corners in the map for the given dictionary.
-// It can return 0..4 detected points
-std::unordered_map<int32_t, cv::Point> DetectArucoPoints(
-    const cv::Mat& image, const cv::aruco::Dictionary& dictionary);
+// Given an image with Aruco tags, Aruco dictionary and object points,
+// it returns the vector of correspondence.
+// For example, there are object points [{0, 0, "1"}, {320, 0, "2"}]
+// and only one Aruco marker was detected as 2, then the function returns
+// [{2, {10, 2} {320, 0}}] assuming that Aruco tag 2 was detected at {10, 2}.
+std::vector<Correspondence> DetectArucoPoints(
+    const cv::Mat& image, const cv::aruco::Dictionary& dictionary,
+    const std::vector<ObjectPoint>& object_points);
 
 // Detects corners of the biggest contour.
 std::unordered_map<int32_t, cv::Point> DetectCorners(const cv::Mat& image);
