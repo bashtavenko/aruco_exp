@@ -75,10 +75,11 @@ TEST(LoadFromTextManifestProto, Works) {
       LoadFromTextProtoFile<aruco::proto::Context>(text_proto_file_path),
       IsOkAndHolds(Partially(EqualsProto(
           R"pb(
-            points { x: 0 y: 0 z: 0 tag: "tl" }
-            points { x: 320 y: 0 z: 0 tag: "tr" }
-            points { x: 320 y: 250 z: 0 tag: "br" }
-            points { x: 0 y: 250 z: 0 tag: "bl" }
+            points { x: 0 y: 0 z: 0 tag: "1" }
+            points { x: 320 y: 0 z: 0 tag: "2" }
+            points { x: 320 y: 250 z: 0 tag: "3" }
+            points { x: 0 y: 250 z: 0 tag: "4" }
+            dictionary: DICT_6X6_250
           )pb"))));
 }
 

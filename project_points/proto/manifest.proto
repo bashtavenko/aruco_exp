@@ -32,6 +32,14 @@ message ItemPositions {
   ObjectPoint point = 2;
 }
 
+// Aruco dictionary
+enum ArucoDictionary {
+  DICT_UNKNOWN = 0;
+  DICT_6X6_250 = 1;
+  DICT_4X4_50 = 2;
+}
+
+
 // World to be represented. Has multiple object points to represent boundary
 // This can be at least four object points but it could be more. At least
 // the boundary are guaranteed to be be convex haul.
@@ -40,4 +48,7 @@ message Context {
   repeated Item items = 2;
   repeated ItemPositions item_points = 3;   // Items
   repeated Pocket pockets = 4;                 // Pockets
+  ArucoDictionary dictionary = 5;
 }
+
+

@@ -4,7 +4,6 @@
 // --manifest_path=testdata/local/real_tray/real_manifest.txtpb
 #include <oneapi/tbb/detail/_task.h>
 #include <filesystem>
-#include <unordered_set>
 #include "absl/flags/flag.h"
 #include "absl/flags/parse.h"
 #include "absl/status/status.h"
@@ -13,7 +12,6 @@
 #include "glog/logging.h"
 #include "opencv2/core.hpp"
 #include "opencv2/highgui.hpp"
-#include "opencv2/objdetect/aruco_dictionary.hpp"
 #include "project_points/highgui_utils.h"
 #include "project_points/projection.h"
 #include "project_points/proto_utils.h"
@@ -34,10 +32,8 @@ ABSL_FLAG(std::string, output_video_path, "", "Output of projection");
 absl::Status ProcessImage(const cv::Mat& image,
                           const aruco::IntrinsicCalibration& calibration,
                           const aruco::Context& context) {
-  const cv::aruco::Dictionary kDictionary =
-      cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_250);
   const std::unordered_map<int32_t, cv::Point> detected_points =
-      aruco::DetectArucoPoints(image, kDictionary);
+      aruco::DetectArucoPoints(image, context.dictionary);
   const std::vector<cv::Scalar> corner_colors = {
       aruco::kMAGENTA, aruco::kCYAN, aruco::kYELLOW, aruco::kORANGE};
   for (const auto& [id, point] : detected_points) {

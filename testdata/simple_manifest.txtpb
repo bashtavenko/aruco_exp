@@ -2,25 +2,25 @@ points {
   x: 0
   y: 0
   z: 0
-  tag: "tl"
+  tag: "1"
 }
 points {
   x: 320
   y: 0
   z: 0
-  tag: "tr"
+  tag: "2"
 }
 points {
   x: 320
   y: 250
   z: 0
-  tag: "br"
+  tag: "3"
 }
 points {
   x: 0
   y: 250
   z: 0
-  tag: "bl"
+  tag: "4"
 }
 items {
   id: 1
@@ -34,3 +34,4 @@ item_points {
     y: 100
   }
 }
+dictionary: DICT_6X6_250

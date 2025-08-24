@@ -70,6 +70,7 @@ cc_library(
         "//project_points/proto:manifest_cc",
         "@absl//absl/status:statusor",
         "@absl//absl/strings",
+        "@glog",
     ],
 )
 

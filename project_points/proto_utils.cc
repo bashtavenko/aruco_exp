@@ -1,7 +1,8 @@
 #include "project_points/proto_utils.h"
-#include <google/protobuf/text_format.h>
 #include <filesystem>
 #include <fstream>
+#include "glog/logging.h"
+#include "opencv2/objdetect/aruco_dictionary.hpp"
 
 namespace aruco {
 
@@ -50,6 +51,21 @@ Context ConvertContextFromProto(const aruco::proto::Context& proto) {
         .object_point =
             cv::Point3f(item_point.point().x(), item_point.point().y(),
                         item_point.point().z())});
+  }
+  switch (proto.dictionary()) {
+    case proto::DICT_6X6_250:
+      result.dictionary =
+          cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_250);
+      break;
+    case proto::DICT_4X4_50:
+      result.dictionary =
+          cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_50);
+      break;
+    case proto::DICT_UNKNOWN:
+      CHECK(false) << "Unknown dictionary type";
+      break;
+    default:
+      CHECK(false) << "Missing dictionary type";
   }
   return result;
 }
