@@ -96,3 +96,43 @@ cc_library(
         "@absl//absl/strings",
     ],
 )
+
+cc_library(
+    name = "corner_detector",
+    srcs = ["corner_detector.cc"],
+    hdrs = ["corner_detector.h"],
+    deps = [
+        ":projection",
+        "//:opencv",
+        "@absl//absl/status:statusor",
+    ],
+)
+
+cc_test(
+    name = "corner_detector_test",
+    srcs = ["corner_detector_test.cc"],
+    data = ["testdata"],
+    deps = [
+        "@absl//absl/status:status_matchers",
+        "@bazel_tools//tools/cpp/runfiles",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_binary(
+    name = "corner_detector_main",
+    srcs = ["corners_detector_main.cc"],
+    data = ["//testdata"],
+    deps = [
+        ":corner_detector",
+        ":highgui_utils",
+        "//:opencv",
+        "@absl//absl/flags:flag",
+        "@absl//absl/flags:parse",
+        "@absl//absl/status",
+        "@absl//absl/strings",
+        "@gflags",
+        "@glog",
+        "@status_macros",
+    ],
+)

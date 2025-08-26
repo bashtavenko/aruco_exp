@@ -53,7 +53,7 @@ std::vector<Correspondence> DetectArucoPoints(
     const std::vector<ObjectPoint>& object_points);
 
 // Detects corners of the biggest contour.
-std::unordered_map<int32_t, cv::Point> DetectCorners(const cv::Mat& image);
+// std::unordered_map<int32_t, cv::Point> DetectCorners(const cv::Mat& image);
 
 // Projects source object points to the taget and returns image points.
 absl::StatusOr<std::vector<cv::Point2f>> ProjectPoints(
