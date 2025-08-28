@@ -5,6 +5,18 @@ namespace aruco {
 std::vector<Correspondence> DetectCorners(
     const cv::Mat& image, const cv::aruco::Dictionary& dictionary,
     const std::vector<ObjectPoint>& object_points) {
+  std::vector<std::vector<cv::Point>> contours;
+  std::vector<cv::Point> best_contour;
+
+  return DetectCorners(image, dictionary, object_points, contours,
+                       best_contour);
+}
+
+std::vector<Correspondence> DetectCorners(
+    const cv::Mat& image, const cv::aruco::Dictionary& dictionary,
+    const std::vector<ObjectPoint>& object_points,
+    std::vector<std::vector<cv::Point>>& contours,
+    std::vector<cv::Point>& best_contour) {
   std::vector<Correspondence> correspondences;
 
   // Preprocessing
@@ -25,25 +37,23 @@ std::vector<Correspondence> DetectCorners(
   cv::dilate(thresholded, thresholded, kernel);
 
   // Find the largest contours
-  std::vector<std::vector<cv::Point>> contours;
   cv::findContours(thresholded, contours, cv::RETR_EXTERNAL,
                    cv::CHAIN_APPROX_SIMPLE);
   double max_area = 0;
-  std::vector<cv::Point> largest_contour;
   for (size_t i = 0; i < contours.size(); ++i) {
     double area = cv::contourArea(contours[i]);
     if (area > max_area) {
       max_area = area;
-      largest_contour = contours[i];
+      best_contour = contours[i];
     }
   }
 
   // Simplifies contour into a polygon with fewer vertices
   // while retaining its overall shape.
   std::vector<cv::Point2f> corners(4);
-  cv::approxPolyDP(/*curve=*/largest_contour,
+  cv::approxPolyDP(/*curve=*/best_contour,
                    /*approxCurve=*/corners, /*epsilon=*/
-                   0.02 * cv::arcLength(largest_contour,
+                   0.02 * cv::arcLength(best_contour,
                                         /*closed=*/true),
                    /*closed=*/true);
 

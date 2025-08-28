@@ -21,8 +21,11 @@ absl::Status DetectCorners(const cv::Mat& image) {
 
   std::vector<aruco::ObjectPoint> object_points;
 
-  std::vector<aruco::Correspondence> result =
-      DetectCorners(image, dictionary, object_points);
+  std::vector<std::vector<cv::Point>> contours;
+  std::vector<cv::Point> best_contour;
+
+  std::vector<aruco::Correspondence> result = DetectCorners(
+      image, dictionary, object_points, contours, best_contour);
 
   if (result.empty()) return absl::OkStatus();
 
@@ -30,8 +33,14 @@ absl::Status DetectCorners(const cv::Mat& image) {
     aruco::DrawCircle(image, correspondence.image_point, aruco::kRED);
   }
 
+  cv::Mat thresholded;
+  thresholded = cv::Scalar::all(0);
+  cv::drawContours(thresholded, contours, -1, cv::Scalar::all(255));
+
   constexpr absl::string_view kWindow = "Detection";
+  constexpr absl::string_view kContours = "Contours";
   cv::namedWindow(kWindow.data(), cv::WINDOW_FREERATIO);
+  cv::namedWindow(kContours.data(), cv::WINDOW_FREERATIO);
   cv::imshow(kWindow.data(), image);
   cv::waitKey(0);
   return absl::OkStatus();
