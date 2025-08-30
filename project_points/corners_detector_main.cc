@@ -12,7 +12,7 @@
 #include "project_points/highgui_utils.h"
 #include "status_macros.h"
 
-ABSL_FLAG(std::string, image_path, "testdata/corners/plastic_1_90.jpg",
+ABSL_FLAG(std::string, image_path, "testdata/corners/plastic_1.jpg",
           "Image that may have Aruco and tray");
 
 absl::Status DetectCorners(const cv::Mat& image) {
@@ -21,28 +21,29 @@ absl::Status DetectCorners(const cv::Mat& image) {
 
   std::vector<aruco::ObjectPoint> object_points;
 
+  cv::Mat thresholded;
   std::vector<std::vector<cv::Point>> contours;
-  std::vector<cv::Point> best_contour;
 
-  std::vector<aruco::Correspondence> result = DetectCorners(
-      image, dictionary, object_points, contours, best_contour);
+  std::vector<aruco::Correspondence> result =
+      DetectCorners(image, dictionary, object_points, thresholded, contours);
 
   if (result.empty()) return absl::OkStatus();
 
   for (const aruco::Correspondence& correspondence : result) {
     aruco::DrawCircle(image, correspondence.image_point, aruco::kRED);
   }
+  constexpr absl::string_view kWindow = "Detection";
+  cv::namedWindow(kWindow.data(), cv::WINDOW_FREERATIO);
+  cv::imshow(kWindow.data(), image);
 
-  cv::Mat thresholded;
   thresholded = cv::Scalar::all(0);
   cv::drawContours(thresholded, contours, -1, cv::Scalar::all(255));
 
-  constexpr absl::string_view kWindow = "Detection";
   constexpr absl::string_view kContours = "Contours";
-  cv::namedWindow(kWindow.data(), cv::WINDOW_FREERATIO);
   cv::namedWindow(kContours.data(), cv::WINDOW_FREERATIO);
-  cv::imshow(kWindow.data(), image);
+  cv::imshow(kContours.data(), thresholded);
   cv::waitKey(0);
+  cv::destroyAllWindows();
   return absl::OkStatus();
 }
 

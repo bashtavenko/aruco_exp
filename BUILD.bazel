@@ -96,6 +96,7 @@ cc_binary(
 cc_binary(
     name = "scanner_main",
     srcs = ["scanner_main.cc"],
+    data = ["testdata"],
     deps = [
         "//:opencv",
         "//project_points:highgui_utils",

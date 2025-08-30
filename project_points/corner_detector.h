@@ -14,8 +14,8 @@ std::vector<Correspondence> DetectCorners(
 std::vector<Correspondence> DetectCorners(
     const cv::Mat& image, const cv::aruco::Dictionary& dictionary,
     const std::vector<ObjectPoint>& object_points,
-    std::vector<std::vector<cv::Point>>& contours,
-    std::vector<cv::Point>& best_contour);
+    cv::Mat& thresholded,
+    std::vector<std::vector<cv::Point>>& contours);
 
 }  // namespace aruco
 

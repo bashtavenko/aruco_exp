@@ -1,3 +1,4 @@
+#include "status_macros.h"
 #include "absl/flags/flag.h"
 #include "absl/flags/parse.h"
 #include "absl/status/status.h"
@@ -8,13 +9,21 @@
 #include "opencv2/objdetect/aruco_dictionary.hpp"
 #include "project_points/highgui_utils.h"
 
-absl::Status Run() {
-  cv::VideoCapture cap(0);
-  if (!cap.isOpened()) {
-    return absl::InvalidArgumentError(
-        absl::StrFormat("Failed to open camera."));
+ABSL_FLAG(std::string, image_path, "testdata/corners/plastic_1.jpg",
+          "Image that may have Aruco tags. If empty tries to open camera.");
+
+void DetectAndDrawAruco(const cv::Mat& image,
+                        const cv::aruco::ArucoDetector& detector) {
+  std::vector<int32_t> ids;
+  std::vector<std::vector<cv::Point2f>> corners;
+  detector.detectMarkers(image, corners, ids, cv::noArray());
+  if (!ids.empty()) {
+    cv::aruco::drawDetectedMarkers(image, corners, ids);
   }
-  // Get input video properties
+}
+
+absl::Status RunVideo() {
+  cv::VideoCapture cap(0);
   const int32_t frame_width =
       static_cast<int>(cap.get(cv::CAP_PROP_FRAME_WIDTH));
   const int32_t frame_height =
@@ -28,14 +37,6 @@ absl::Status Run() {
       cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_50);
   const auto detectorParams = cv::aruco::DetectorParameters();
   const cv::aruco::ArucoDetector detector(dictionary, detectorParams);
-  auto detect = [&detector](const cv::Mat& image) {
-    std::vector<int32_t> ids;
-    std::vector<std::vector<cv::Point2f>> corners;
-    detector.detectMarkers(image, corners, ids, cv::noArray());
-    if (!ids.empty()) {
-      cv::aruco::drawDetectedMarkers(image, corners, ids);
-    }
-  };
 
   cv::Mat frame;
   int32_t frame_count = 0;
@@ -43,7 +44,7 @@ absl::Status Run() {
   while (cap.read(frame)) {
     ++frame_count;
     const int64_t start_ticks = cv::getTickCount();
-    detect(frame);
+    DetectAndDrawAruco(frame, detector);
     cv::imshow("Scanner", frame);
     const int64_t end_ticks = cv::getTickCount();
     total_processing_ticks += (end_ticks - start_ticks);
@@ -60,6 +61,34 @@ absl::Status Run() {
   LOG(INFO) << absl::StreamFormat("Mean FPS: %.0f", processing_fps);
   LOG(INFO) << absl::StreamFormat("Mean latency %.0f ms", mean_ms_per_frame);
 
+  return absl::OkStatus();
+}
+
+absl::Status RunImage(const cv::Mat& image) {
+  const cv::aruco::Dictionary dictionary =
+      cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_50);
+  const auto detectorParams = cv::aruco::DetectorParameters();
+  const cv::aruco::ArucoDetector detector(dictionary, detectorParams);
+
+  DetectAndDrawAruco(image, detector);
+  constexpr absl::string_view kWindow = "Detection";
+  cv::namedWindow(kWindow.data(), cv::WINDOW_FREERATIO);
+  cv::imshow(kWindow.data(), image);
+  cv::waitKey(0);
+  return absl::OkStatus();
+}
+
+absl::Status Run() {
+  if (absl::GetFlag(FLAGS_image_path).empty()) {
+    RETURN_IF_ERROR(RunVideo());
+  } else {
+    cv::Mat image = cv::imread(absl::GetFlag(FLAGS_image_path));
+    if (image.empty()) {
+      return absl::InvalidArgumentError("Image not found: " +
+                                        absl::GetFlag(FLAGS_image_path));
+    }
+    RETURN_IF_ERROR(RunImage(image));
+  }
   return absl::OkStatus();
 }
 
