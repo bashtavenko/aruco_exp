@@ -1,4 +1,5 @@
 // Very basic interactive corner detection without Aruco
+#include <queue>
 #include "absl/flags/flag.h"
 #include "absl/flags/parse.h"
 #include "absl/status/status.h"
@@ -91,26 +92,44 @@ absl::Status Run() {
   cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3));
   cv::dilate(thresholded, thresholded, kernel);
 
-  // Find the largest contours
+  // Find the largest contour
   std::vector<std::vector<cv::Point>> contours;
-  std::vector<cv::Point> largest_contour;
   cv::findContours(thresholded, contours, cv::RETR_EXTERNAL,
                    cv::CHAIN_APPROX_SIMPLE);
-  double max_area = 0;
-  for (size_t i = 0; i < contours.size(); ++i) {
-    double area = cv::contourArea(contours[i]);
-    if (area > max_area) {
-      max_area = area;
-      largest_contour = contours[i];
+  std::priority_queue<std::vector<cv::Point>,
+                      std::vector<std::vector<cv::Point>>,
+                      std::function<bool(const std::vector<cv::Point>&,
+                                         const std::vector<cv::Point>&)>>
+      min_heap(
+          [](const std::vector<cv::Point>& a, const std::vector<cv::Point>& b) {
+            return cv::contourArea(a) >= cv::contourArea(b);
+          });
+  constexpr size_t kMaxContours = 3;
+  for (auto contour : contours) {
+    min_heap.emplace(contour);
+    if (min_heap.size() == kMaxContours + 1) {
+      min_heap.pop();
     }
   }
+  std::vector<std::vector<cv::Point>> top_contours;
+  while (!min_heap.empty()) {
+    top_contours.emplace_back(min_heap.top());
+    min_heap.pop();
+  }
+  const std::vector<cv::Point>& largest_contour =
+      top_contours[kMaxContours - 1];
 
-  // Show contours
+  // Show all contours in thresholded image
   thresholded = cv::Scalar::all(0);
   cv::drawContours(thresholded, contours, -1, cv::Scalar::all(255));
   constexpr absl::string_view kContours = "Contours";
   cv::namedWindow(kContours.data(), cv::WINDOW_FREERATIO);
   cv::imshow(kContours.data(), thresholded);
+
+  // Show the largest contour in the main image
+  for (const auto& point : largest_contour) {
+    aruco::DrawCircle(image, point, aruco::kBLUE, 500);
+  }
 
   // Simplifies contour into a polygon with fewer vertices
   // while retaining its overall shape.
