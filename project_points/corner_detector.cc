@@ -21,7 +21,7 @@ std::vector<Correspondence> DetectCorners(
   cv::Mat gray;
   cv::Mat blurred;
   cv::cvtColor(image, gray, cv::COLOR_BGR2GRAY);
-  cv::GaussianBlur(gray, blurred, cv::Size(5, 5), 0);  // Noise suppression
+  cv::GaussianBlur(gray, blurred, cv::Size(9, 9), 0);  // Noise suppression
 
   // Thresholding
   cv::adaptiveThreshold(blurred, thresholded, 255,
@@ -31,6 +31,7 @@ std::vector<Correspondence> DetectCorners(
   // Morphology
   cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(3, 3));
   cv::dilate(thresholded, thresholded, kernel);
+  // cv::morphologyEx(thresholded, thresholded, cv::MORPH_CLOSE, kernel);
 
   // Find the largest contours
   std::vector<cv::Point> largest_contour;

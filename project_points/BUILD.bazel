@@ -121,10 +121,27 @@ cc_test(
 
 cc_binary(
     name = "corner_detector_main",
-    srcs = ["corners_detector_main.cc"],
+    srcs = ["corner_detector_main.cc"],
     data = ["//testdata"],
     deps = [
         ":corner_detector",
+        ":highgui_utils",
+        "//:opencv",
+        "@absl//absl/flags:flag",
+        "@absl//absl/flags:parse",
+        "@absl//absl/status",
+        "@absl//absl/strings",
+        "@gflags",
+        "@glog",
+        "@status_macros",
+    ],
+)
+
+cc_binary(
+    name = "corner_detector_playground",
+    srcs = ["corner_detector_playground.cc"],
+    data = ["//testdata"],
+    deps = [
         ":highgui_utils",
         "//:opencv",
         "@absl//absl/flags:flag",
