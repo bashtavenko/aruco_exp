@@ -7,15 +7,18 @@
 
 namespace aruco {
 
-std::vector<Correspondence> DetectCorners(
-    const cv::Mat& image, const cv::aruco::Dictionary& dictionary,
-    const std::vector<ObjectPoint>& object_points);
-
-std::vector<Correspondence> DetectCorners(
-    const cv::Mat& image, const cv::aruco::Dictionary& dictionary,
-    const std::vector<ObjectPoint>& object_points,
-    cv::Mat& thresholded,
-    std::vector<std::vector<cv::Point>>& contours);
+// Detects corners with one Aruco marker outside:
+//   x   (10,10)   (50,10)
+//       o-------o
+//       |       |
+//       |       |
+//       o-------o  (50, 100)
+//      (10,100)
+// Returns either 4 points or zero.
+// If 4 points are returned, they numbered in clockwise order
+// starting from the aruco marker.
+std::vector<cv::Point> DetectCorners(const cv::Mat& image,
+  const cv::aruco::ArucoDetector& detector);
 
 }  // namespace aruco
 

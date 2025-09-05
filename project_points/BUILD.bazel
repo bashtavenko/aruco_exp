@@ -105,6 +105,7 @@ cc_library(
         ":projection",
         "//:opencv",
         "@absl//absl/status:statusor",
+        "@glog",
     ],
 )
 

@@ -1,4 +1,5 @@
-// Very basic interactive corner detection without Aruco
+// Interactive contour debugging
+// Some of this code can be duplicated.
 #include <queue>
 #include "absl/flags/flag.h"
 #include "absl/flags/parse.h"
@@ -34,7 +35,7 @@ size_t ClosestDistanceFromArucoIndex(
     double point_test =
         cv::pointPolygonTest(largest_contour[i], point.value(), true);
     if (point_test >= 0) continue;
-    ;
+
     const double distance = std::abs(point_test);
     if (distance < min_distance) {
       min_distance = distance;
