@@ -1,5 +1,5 @@
 load("@buildifier_prebuilt//:rules.bzl", "buildifier")
-load("@rules_cc//cc:defs.bzl", "cc_library", "cc_binary", "cc_test")
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library", "cc_test")
 
 package(default_visibility = ["//visibility:public"])
 
@@ -28,15 +28,6 @@ cc_library(
     }),
     hdrs = glob(["third_party/opencv/include/**/*"]),
     includes = ["third_party/opencv/include"],
-    linkopts = [
-        "-lopencv_core",
-        "-lopencv_imgproc",
-        "-lopencv_flann",
-        "-lopencv_features2d",
-        "-lopencv_calib3d",
-        "-lopencv_objdetect",
-        "-lopencv_aruco",
-    ],
 )
 
 cc_library(
@@ -53,18 +44,6 @@ cc_library(
     }),
     hdrs = glob(["third_party/opencv/include/**/*"]),
     includes = ["third_party/opencv/include"],
-    # Aruco depends on
-    # aruco opencv_core opencv_imgproc opencv_calib3d opencv_objdetect WRAP python java objc js
-    # Which means the order of dependencies must be in reverse order as opposed to CMake order
-    linkopts = [
-        "-lopencv_core",
-        "-lopencv_imgproc",
-        "-lopencv_flann",
-        "-lopencv_features2d",
-        "-lopencv_calib3d",
-        "-lopencv_objdetect",
-        "-lopencv_aruco",
-    ],
 )
 
 config_setting(

@@ -62,7 +62,6 @@ std::unordered_map<int32_t, cv::Point> DetectCorners(const cv::Mat& image) {
   std::unordered_map<int32_t, cv::Point> detected_object_points;
 
   // Preprocessing
-  int64 start = cv::getTickCount();
   cv::Mat gray;
   cv::Mat blurred;
   cv::cvtColor(image, gray, cv::COLOR_BGR2GRAY);

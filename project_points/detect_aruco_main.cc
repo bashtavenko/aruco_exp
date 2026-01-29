@@ -88,6 +88,7 @@ absl::Status Run() {
     return absl::InvalidArgumentError(absl::StrCat(
         "Invalid detector type:", absl::GetFlag(FLAGS_detector_type)));
   };
+  return absl::OkStatus();
 }
 
 int main(int argc, char** argv) {
