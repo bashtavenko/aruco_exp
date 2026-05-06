@@ -48,14 +48,16 @@ fi
 mkdir -p "$BUILD_SUBDIR"
 cd "$BUILD_SUBDIR"
 
+# To use VTK sudo apt-get install -y libvtk9-dev
 echo "Configuring CMake for $BUILD_TYPE build..."
 cmake \
     -DCMAKE_BUILD_TYPE="$BUILD_TYPE" \
-    -DBUILD_LIST=calib3d,core,features2d,highgui,imgcodecs,imgproc,video,videoio,aruco,objdetect \
+    -DBUILD_LIST=calib3d,core,features2d,highgui,imgcodecs,imgproc,video,videoio,aruco,objdetect,viz \
     -DOPENCV_EXTRA_MODULES_PATH="../opencv_contrib-${OPENCV_VERSION}/modules" \
     -DWITH_FFMPEG=ON \
     -DWITH_GTK=OFF \
     -DWITH_QT=ON \
+    -DWITH_VTK=ON \
     -DBUILD_SHARED_LIBS=ON \
     -DCMAKE_INSTALL_PREFIX="$INSTALL_DIR" \
     -DBUILD_TESTS=OFF \
@@ -64,7 +66,7 @@ cmake \
      "../opencv-${OPENCV_VERSION}"
 
 echo "Building OpenCV..."
-make -j$(sysctl -n hw.logicalcpu)
+make -j$(nproc)
 
 
 echo "Installing OpenCV..."

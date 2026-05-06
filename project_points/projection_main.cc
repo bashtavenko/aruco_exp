@@ -2,7 +2,6 @@
 // bazel run //project_points:projection_main --
 // --image_or_video_path=testdata/local/real_tray/scan.mp4
 // --manifest_path=testdata/local/real_tray/real_manifest.txtpb
-#include <oneapi/tbb/detail/_task.h>
 #include <filesystem>
 #include "absl/flags/flag.h"
 #include "absl/flags/parse.h"
